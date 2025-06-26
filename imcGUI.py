@@ -2,6 +2,7 @@ import subprocess
 import os
 import tkinter as tk
 from tkinter import ttk, messagebox
+from PIL import Image, ImageTk
 import psutil
 import imc
 import imcDB
@@ -18,6 +19,18 @@ class GUI:
 
         fuente = ("Segoe UI", 10)
 
+        # Frame principal para dividir en dos columnas
+        main_frame = tk.Frame(self.__ventana, bg="#E8F0FE")
+        main_frame.pack(fill="both", expand=True)
+
+        # Frame izquierdo para los controles
+        frame_izq = tk.Frame(main_frame, bg="#E8F0FE")
+        frame_izq.place(relx=0, rely=0, relwidth=0.55, relheight=1)
+
+        # Frame derecho para la imagen
+        frame_der = tk.Frame(main_frame, bg="#E8F0FE")
+        frame_der.place(relx=0.55, rely=0, relwidth=0.45, relheight=1)
+
         # Variables
         self.__nombre = tk.StringVar()
         self.__edad = tk.IntVar(value=18)
@@ -28,16 +41,15 @@ class GUI:
 
         self.__nombre.trace_add("write", self.__activar_campos)
 
-        # Fila 0: Nombre
-        tk.Label(self.__ventana, text="Nombre:", font=fuente, bg="#E8F0FE").grid(
+        # --- Controles en frame_izq ---
+        tk.Label(frame_izq, text="Nombre:", font=fuente, bg="#E8F0FE").grid(
             row=0, column=0, sticky="e", pady=5, padx=5)
         self.__entrada_nombre = ttk.Entry(
-            self.__ventana, textvariable=self.__nombre, font=fuente, width=25)
+            frame_izq, textvariable=self.__nombre, font=fuente, width=25)
         self.__entrada_nombre.grid(row=0, column=1, padx=5)
 
-        # Fila 1: Mensaje de bienvenida (centrado dentro del Label)
         self.__etiqueta_bienvenida = tk.Label(
-            self.__ventana,
+            frame_izq,
             textvariable=self.__mensaje_bienvenida,
             font=("Segoe UI", 10, "italic"),
             bg="#E8F0FE",
@@ -48,39 +60,34 @@ class GUI:
         self.__etiqueta_bienvenida.grid(
             row=1, column=0, columnspan=2, pady=5, sticky="ew")
 
-        # Fila 2: Edad
-        tk.Label(self.__ventana, text="Edad:", font=fuente, bg="#E8F0FE").grid(
+        tk.Label(frame_izq, text="Edad:", font=fuente, bg="#E8F0FE").grid(
             row=2, column=0, sticky="e", pady=5, padx=5)
         self.__spin_edad = tk.Spinbox(
-            self.__ventana, from_=1, to=120, textvariable=self.__edad, font=fuente, width=5, state="disabled", bg="#E8F0FE")  # <--- fondo igual
+            frame_izq, from_=1, to=120, textvariable=self.__edad, font=fuente, width=5, state="disabled", bg="#E8F0FE")
         self.__spin_edad.grid(row=2, column=1, sticky="w", padx=5)
 
-        # Fila 3: Estatura (con Scale)
-        tk.Label(self.__ventana, text="Estatura (m):", font=fuente, bg="#E8F0FE").grid(
+        tk.Label(frame_izq, text="Estatura (m):", font=fuente, bg="#E8F0FE").grid(
             row=3, column=0, sticky="ne", pady=5, padx=5)
         self.__scale_estatura = tk.Scale(
-            self.__ventana, from_=0.30, to=2.50, resolution=0.01,
+            frame_izq, from_=0.30, to=2.50, resolution=0.01,
             orient="horizontal", variable=self.__estatura,
-            length=250, state="disabled", bg="#E8F0FE", highlightthickness=0)  # <--- fondo igual
+            length=250, state="disabled", bg="#E8F0FE", highlightthickness=0)
         self.__scale_estatura.grid(row=3, column=1, sticky="w", pady=5)
 
-        # Fila 4: Peso (con Scale)
-        tk.Label(self.__ventana, text="Peso (kg):", font=fuente, bg="#E8F0FE").grid(
+        tk.Label(frame_izq, text="Peso (kg):", font=fuente, bg="#E8F0FE").grid(
             row=4, column=0, sticky="ne", pady=5, padx=5)
         self.__scale_peso = tk.Scale(
-            self.__ventana, from_=5, to=200, resolution=0.5,
+            frame_izq, from_=5, to=200, resolution=0.5,
             orient="horizontal", variable=self.__peso,
-            length=250, state="disabled", bg="#E8F0FE", highlightthickness=0)  # <--- fondo igual
+            length=250, state="disabled", bg="#E8F0FE", highlightthickness=0)
         self.__scale_peso.grid(row=4, column=1, sticky="w", pady=5)
 
-        # Fila 5: Botones principales
-        ttk.Button(self.__ventana, text="Calcular IMC", command=self.__calcular).grid(
+        ttk.Button(frame_izq, text="Calcular IMC", command=self.__calcular).grid(
             row=5, column=0, pady=10, padx=5)
-        ttk.Button(self.__ventana, text="Limpiar", command=self.__limpiar).grid(
+        ttk.Button(frame_izq, text="Limpiar", command=self.__limpiar).grid(
             row=5, column=1, padx=5, sticky="w")
 
-        # Fila 6: Resumen
-        self.__resumen = tk.LabelFrame(self.__ventana, text="Resultado", font=("Segoe UI", 9, "bold"),
+        self.__resumen = tk.LabelFrame(frame_izq, text="Resultado", font=("Segoe UI", 9, "bold"),
                                        bg="#F7FBFF", padx=10, pady=10)
         self.__resumen.grid(row=6, column=0, columnspan=2,
                             pady=10, padx=10, sticky="ew")
@@ -89,14 +96,26 @@ class GUI:
         tk.Label(self.__resumen, textvariable=self.__info,
                  justify="left", bg="#F7FBFF", font=("Segoe UI", 9)).pack()
 
-        # Fila 7: Botones extra
-        marco_extra = tk.Frame(self.__ventana, bg="#E8F0FE")
+        marco_extra = tk.Frame(frame_izq, bg="#E8F0FE")
         marco_extra.grid(row=7, column=0, columnspan=2, pady=10)
 
         tk.Button(marco_extra, text="Ver Registros (externo)",
                   command=self.__abrir_catalogo, bg="#E8F0FE", font=fuente).pack(side="left", padx=10)
         tk.Button(marco_extra, text="Cerrar",
                   command=self.__confirmar_cierre, bg="#E8F0FE", font=fuente).pack(side="right", padx=10)
+
+        # --- Imagen en frame_der ---
+        ruta_img = os.path.join("resources", "imc.jpg")
+        try:
+            imagen = Image.open(ruta_img)
+            imagen = imagen.resize((280, 350), Image.ANTIALIAS)
+            self.__imgtk = ImageTk.PhotoImage(imagen)
+            label_img = tk.Label(frame_der, image=self.__imgtk, bg="#E8F0FE")
+            label_img.place(relx=0.5, rely=0.5, anchor="center")
+        except Exception as e:
+            label_img = tk.Label(
+                frame_der, text="No se pudo cargar la imagen.", bg="#E8F0FE")
+            label_img.place(relx=0.5, rely=0.5, anchor="center")
 
         self.__centrar_ventana()
 
