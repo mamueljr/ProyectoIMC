@@ -1,17 +1,19 @@
-import tkinter as tk
-from tkinter import ttk, messagebox
-import imc
-import imcDB
 import subprocess
 import os
+import tkinter as tk
+from tkinter import ttk, messagebox
 import psutil
+import imc
+import imcDB
+import catalogoIMC
+
 
 class GUI:
     def __init__(self):
         self.__ventana = tk.Tk()
         self.__ventana.title("Calculadora de IMC")
         self.__ventana.configure(bg="#E8F0FE")
-        self.__ventana.geometry("500x550")
+        self.__ventana.geometry("700x500")
         self.__ventana.resizable(False, False)
 
         fuente = ("Segoe UI", 10)
@@ -27,8 +29,10 @@ class GUI:
         self.__nombre.trace_add("write", self.__activar_campos)
 
         # Fila 0: Nombre
-        ttk.Label(self.__ventana, text="Nombre:", font=fuente).grid(row=0, column=0, sticky="e", pady=5, padx=5)
-        self.__entrada_nombre = ttk.Entry(self.__ventana, textvariable=self.__nombre, font=fuente, width=25)
+        tk.Label(self.__ventana, text="Nombre:", font=fuente, bg="#E8F0FE").grid(
+            row=0, column=0, sticky="e", pady=5, padx=5)
+        self.__entrada_nombre = ttk.Entry(
+            self.__ventana, textvariable=self.__nombre, font=fuente, width=25)
         self.__entrada_nombre.grid(row=0, column=1, padx=5)
 
         # Fila 1: Mensaje de bienvenida (centrado dentro del Label)
@@ -41,49 +45,58 @@ class GUI:
             justify="center",
             anchor="center"
         )
-        self.__etiqueta_bienvenida.grid(row=1, column=0, columnspan=2, pady=5, sticky="ew")
+        self.__etiqueta_bienvenida.grid(
+            row=1, column=0, columnspan=2, pady=5, sticky="ew")
 
         # Fila 2: Edad
-        ttk.Label(self.__ventana, text="Edad:", font=fuente).grid(row=2, column=0, sticky="e", pady=5, padx=5)
-        self.__spin_edad = tk.Spinbox(self.__ventana, from_=1, to=120, textvariable=self.__edad, font=fuente, width=5, state="disabled")
+        tk.Label(self.__ventana, text="Edad:", font=fuente, bg="#E8F0FE").grid(
+            row=2, column=0, sticky="e", pady=5, padx=5)
+        self.__spin_edad = tk.Spinbox(
+            self.__ventana, from_=1, to=120, textvariable=self.__edad, font=fuente, width=5, state="disabled", bg="#E8F0FE")  # <--- fondo igual
         self.__spin_edad.grid(row=2, column=1, sticky="w", padx=5)
 
         # Fila 3: Estatura (con Scale)
-        ttk.Label(self.__ventana, text="Estatura (m):", font=fuente).grid(row=3, column=0, sticky="ne", pady=5, padx=5)
+        tk.Label(self.__ventana, text="Estatura (m):", font=fuente, bg="#E8F0FE").grid(
+            row=3, column=0, sticky="ne", pady=5, padx=5)
         self.__scale_estatura = tk.Scale(
             self.__ventana, from_=0.30, to=2.50, resolution=0.01,
             orient="horizontal", variable=self.__estatura,
-            length=250, state="disabled"
-        )
+            length=250, state="disabled", bg="#E8F0FE", highlightthickness=0)  # <--- fondo igual
         self.__scale_estatura.grid(row=3, column=1, sticky="w", pady=5)
 
         # Fila 4: Peso (con Scale)
-        ttk.Label(self.__ventana, text="Peso (kg):", font=fuente).grid(row=4, column=0, sticky="ne", pady=5, padx=5)
+        tk.Label(self.__ventana, text="Peso (kg):", font=fuente, bg="#E8F0FE").grid(
+            row=4, column=0, sticky="ne", pady=5, padx=5)
         self.__scale_peso = tk.Scale(
             self.__ventana, from_=5, to=200, resolution=0.5,
             orient="horizontal", variable=self.__peso,
-            length=250, state="disabled"
-        )
+            length=250, state="disabled", bg="#E8F0FE", highlightthickness=0)  # <--- fondo igual
         self.__scale_peso.grid(row=4, column=1, sticky="w", pady=5)
 
         # Fila 5: Botones principales
-        ttk.Button(self.__ventana, text="Calcular IMC", command=self.__calcular).grid(row=5, column=0, pady=10, padx=5)
-        ttk.Button(self.__ventana, text="Limpiar", command=self.__limpiar).grid(row=5, column=1, padx=5, sticky="w")
+        ttk.Button(self.__ventana, text="Calcular IMC", command=self.__calcular).grid(
+            row=5, column=0, pady=10, padx=5)
+        ttk.Button(self.__ventana, text="Limpiar", command=self.__limpiar).grid(
+            row=5, column=1, padx=5, sticky="w")
 
         # Fila 6: Resumen
         self.__resumen = tk.LabelFrame(self.__ventana, text="Resultado", font=("Segoe UI", 9, "bold"),
                                        bg="#F7FBFF", padx=10, pady=10)
-        self.__resumen.grid(row=6, column=0, columnspan=2, pady=10, padx=10, sticky="ew")
+        self.__resumen.grid(row=6, column=0, columnspan=2,
+                            pady=10, padx=10, sticky="ew")
         self.__resumen.grid_remove()
 
-        tk.Label(self.__resumen, textvariable=self.__info, justify="left", bg="#F7FBFF", font=("Segoe UI", 9)).pack()
+        tk.Label(self.__resumen, textvariable=self.__info,
+                 justify="left", bg="#F7FBFF", font=("Segoe UI", 9)).pack()
 
         # Fila 7: Botones extra
-        marco_extra = ttk.Frame(self.__ventana)
+        marco_extra = tk.Frame(self.__ventana, bg="#E8F0FE")
         marco_extra.grid(row=7, column=0, columnspan=2, pady=10)
 
-        ttk.Button(marco_extra, text="Ver Registros", command=self.__abrir_catalogo).pack(side="left", padx=10)
-        ttk.Button(marco_extra, text="Cerrar", command=self.__confirmar_cierre).pack(side="right", padx=10)
+        tk.Button(marco_extra, text="Ver Registros (externo)",
+                  command=self.__abrir_catalogo, bg="#E8F0FE", font=fuente).pack(side="left", padx=10)
+        tk.Button(marco_extra, text="Cerrar",
+                  command=self.__confirmar_cierre, bg="#E8F0FE", font=fuente).pack(side="right", padx=10)
 
         self.__centrar_ventana()
 
@@ -103,7 +116,8 @@ class GUI:
     def __activar_campos(self, *args):
         nombre = self.__nombre.get().strip()
         if nombre:
-            self.__mensaje_bienvenida.set(f"Hola {nombre}\n¡Bienvenido a la Calculadora del Índice de Masa Corporal!")
+            self.__mensaje_bienvenida.set(
+                f"Hola {nombre}\n¡Bienvenido a la Calculadora del Índice de Masa Corporal!")
             self.__spin_edad.config(state="normal")
             self.__scale_estatura.config(state="normal")
             self.__scale_peso.config(state="normal")
@@ -166,7 +180,8 @@ class GUI:
             try:
                 subprocess.Popen(["python", "catalogoIMC.py"])
             except Exception as e:
-                messagebox.showerror("Error", f"No se pudo abrir el catálogo:\n{str(e)}")
+                messagebox.showerror(
+                    "Error", f"No se pudo abrir el catálogo:\n{str(e)}")
         else:
             messagebox.showinfo("Atención", "El catálogo ya está abierto.")
 
@@ -182,6 +197,11 @@ class GUI:
     def __confirmar_cierre(self):
         if messagebox.askyesno("Confirmar salida", "¿Deseas cerrar la aplicación?"):
             self.__ventana.destroy()
+
+    # Elimina también el método __abrir_catalogo_interno si no se usará más
+    # def __abrir_catalogo_interno(self):
+    #     ...
+
 
 # Ejecución directa
 if __name__ == "__main__":
