@@ -2,11 +2,11 @@ import subprocess
 import os
 import tkinter as tk
 from tkinter import ttk, messagebox
-from PIL import Image, ImageTk, ImageOps
+from PIL import Image, ImageTk
 import psutil
 import imc
 import imcDB
-import catalogoIMC
+# import catalogoIMC
 
 
 class GUI:
@@ -176,7 +176,6 @@ class GUI:
             self.__info.set(resumen)
             self.__resumen.grid()
             self.__ventana.update_idletasks()
-            self.__ventana.geometry("")
             self.__centrar_ventana()
             messagebox.showinfo("Éxito", "Datos guardados correctamente.")
         except Exception as e:
@@ -190,7 +189,6 @@ class GUI:
         self.__mensaje_bienvenida.set("")
         self.__info.set("")
         self.__resumen.grid_remove()
-        self.__ventana.geometry("")
         self.__centrar_ventana()
         self.__spin_edad.config(state="disabled")
         self.__scale_estatura.config(state="disabled")

@@ -3,6 +3,7 @@ class IMC:
     Clase para calcular el Índice de Masa Corporal (IMC)
     y determinar la clasificación de acuerdo con los valores estándar.
     """
+
     def __init__(self, nombre: str, edad: int, estatura_m: float, peso_kg: float):
         self.__nombre = nombre
         self.__edad = edad
@@ -29,6 +30,27 @@ class IMC:
             return "Obesidad grado III"
 
     def obtener_datos(self) -> dict:
+        """_summary_ 
+        Obtiene los datos de la persona en un diccionario.
+        _description_
+        Args:
+            self (_type_): _description_
+        _type_: _description_
+        _description_
+        Returns:
+            _type_: _description_
+        _description_
+        Args:
+            self (_type_): _description_
+        _type_: _description_
+        _description_
+        Returns:
+            dict: Un diccionario con los datos de la persona.
+
+
+        Returns:
+            dict: _description_
+        """
         return {
             "nombre": self.__nombre,
             "edad": self.__edad,
@@ -39,6 +61,6 @@ class IMC:
         }
 
 # Ejemplo de uso (comentado para pruebas manuales)
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #    persona = IMC("Juan Pérez", 30, 1.75, 72)
 #   print(persona.obtener_datos())

@@ -1,23 +1,28 @@
 import tkinter as tk
+import csv
 from tkinter import ttk, messagebox, filedialog
 import imcDB
-import csv
+
 
 class CatalogoIMC:
+    """ Clase para mostrar un catálogo de IMC registrados en una ventana gráfica.
+    """
+
     def __init__(self):
         self.__ventana = tk.Tk()
         self.__ventana.title("Catálogo de IMC registrados")
         self.__ventana.configure(bg="#F0F4FF")
-        self.__ventana.geometry("800x400")
+        self.__ventana.geometry("800x500")
         self.__ventana.resizable(True, True)
 
-        fuente = ("Segoe UI", 10)
-
-        ttk.Label(self.__ventana, text="Listado de Registros de IMC", font=("Segoe UI", 12, "bold")).pack(pady=10)
+        ttk.Label(self.__ventana, text="Listado de Registros de IMC",
+                  font=("Segoe UI", 12, "bold")).pack(pady=10)
 
         # Tabla Treeview
-        columnas = ("Nombre", "Edad", "Estatura", "Peso", "IMC", "Clasificación")
-        self.__tabla = ttk.Treeview(self.__ventana, columns=columnas, show="headings", height=15)
+        columnas = ("Nombre", "Edad", "Estatura",
+                    "Peso", "IMC", "Clasificación")
+        self.__tabla = ttk.Treeview(
+            self.__ventana, columns=columnas, show="headings", height=15)
 
         for col in columnas:
             self.__tabla.heading(col, text=col)
@@ -29,7 +34,8 @@ class CatalogoIMC:
         self.__cargar_datos()
 
         # Botón Exportar CSV
-        ttk.Button(self.__ventana, text="Exportar a CSV", command=self.__exportar_csv).pack(pady=10)
+        ttk.Button(self.__ventana, text="Exportar a CSV",
+                   command=self.__exportar_csv).pack(pady=10)
 
         self.__ventana.mainloop()
 
@@ -51,14 +57,17 @@ class CatalogoIMC:
 
             with open(archivo, mode="w", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
-                writer.writerow(["Nombre", "Edad", "Estatura", "Peso", "IMC", "Clasificación"])
+                writer.writerow(["Nombre", "Edad", "Estatura",
+                                "Peso", "IMC", "Clasificación"])
                 for item in self.__tabla.get_children():
                     fila = self.__tabla.item(item)["values"]
                     writer.writerow(fila)
 
-            messagebox.showinfo("Éxito", "Archivo CSV exportado correctamente.")
+            messagebox.showinfo(
+                "Éxito", "Archivo CSV exportado correctamente.")
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo exportar:\n{str(e)}")
+
 
 # Ejecución directa
 if __name__ == "__main__":
