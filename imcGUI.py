@@ -2,7 +2,7 @@ import subprocess
 import os
 import tkinter as tk
 from tkinter import ttk, messagebox
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageOps
 import psutil
 import imc
 import imcDB
@@ -99,16 +99,18 @@ class GUI:
         marco_extra = tk.Frame(frame_izq, bg="#E8F0FE")
         marco_extra.grid(row=7, column=0, columnspan=2, pady=10)
 
-        tk.Button(marco_extra, text="Ver Registros (externo)",
+        tk.Button(marco_extra, text="Ver Registros",
                   command=self.__abrir_catalogo, bg="#E8F0FE", font=fuente).pack(side="left", padx=10)
         tk.Button(marco_extra, text="Cerrar",
                   command=self.__confirmar_cierre, bg="#E8F0FE", font=fuente).pack(side="right", padx=10)
 
         # --- Imagen en frame_der ---
         ruta_img = os.path.join("resources", "imc.jpg")
+        ruta_img = os.path.abspath(os.path.join("resources", "imc.jpg"))
+        print("Ruta imagen:", ruta_img)  # Esto mostrará la ruta en la terminal
         try:
             imagen = Image.open(ruta_img)
-            imagen = imagen.resize((280, 350), Image.ANTIALIAS)
+            imagen = imagen.resize((280, 350), Image.Resampling.LANCZOS)
             self.__imgtk = ImageTk.PhotoImage(imagen)
             label_img = tk.Label(frame_der, image=self.__imgtk, bg="#E8F0FE")
             label_img.place(relx=0.5, rely=0.5, anchor="center")
